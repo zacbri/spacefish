@@ -1,7 +1,7 @@
 #!/usr/bin/env fish
+# This will create a temporary fish and fisher installation to run tests within
 
 set -l gitRoot (git rev-parse --show-toplevel)
-set -l testDir (dirname (status --current-filename))
 set -l tmpDir /tmp/spacefish
 
 # Install fisher if not installed in temporary fish env
@@ -18,5 +18,6 @@ if test (count $argv) -gt 0
 	env HOME=$tmpDir fish -c "fishtape $argv[1]"
 else
 	# Otherwise run all test files
-	env HOME=$tmpDir fish -c "fishtape $testDir/*.test.fish"
+	set -l currentDir (dirname (status --current-filename))
+	env HOME=$tmpDir $currentDir/test.fish
 end
