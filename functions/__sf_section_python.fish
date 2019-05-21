@@ -1,7 +1,7 @@
 # pyenv
 #
 
-function __sf_section_pyenv -d "Show current version of venv/pyenv Python, including system."
+function __sf_section_python -d "Show current version of venv/pyenv Python, including system."
 	# ------------------------------------------------------------------------------
 	# Configuration
 	# ------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ function __sf_section_pyenv -d "Show current version of venv/pyenv Python, inclu
 
 	# Show venv/pyenv python version only for Python-specific folders
 	if not test -n "$VIRTUAL_ENV" \
-	    -o test -n "$PYENV_VERSION" \
+	    -o -n "$PYENV_VERSION" \
 		-o -f .python-version \
 		-o -f requirements.txt \
 		-o -f pyproject.toml \
@@ -33,15 +33,19 @@ function __sf_section_pyenv -d "Show current version of venv/pyenv Python, inclu
 		return
 	end
 
-	if test -n "$VIRTUAL_ENV"
-		set -l python_status (python -V | awk '{print $2}')
-	else
-		set -l python_status (pyenv version-name 2>/dev/null) # This line needs explicit testing in an enviroment that has pyenv.
+	set -l python_status (python -V 2>&1 | awk '{print $2}')
+
+	# Not a venv and pyenv available
+	if not test -n "$VIRTUAL_ENV"; and type -q pyenv
+		set -l pyenv_status (pyenv version-name 2>/dev/null) # This line needs explicit testing in an enviroment that has pyenv.
+		if [ "$pyenv_status" = "system" ]
+		 	set python_status "$python_status (system)"
+		end
 	end
 
 	__sf_lib_section \
-		$SPACEFISH_PYENV_COLOR \
-		$SPACEFISH_PYENV_PREFIX \
-		"$SPACEFISH_PYENV_SYMBOL""$python_status" \
-		$SPACEFISH_PYENV_SUFFIX
+		$SPACEFISH_PYTHON_COLOR \
+		$SPACEFISH_PYTHON_PREFIX \
+		"$SPACEFISH_PYTHON_SYMBOL""$python_status" \
+		$SPACEFISH_PYTHON_SUFFIX
 end
